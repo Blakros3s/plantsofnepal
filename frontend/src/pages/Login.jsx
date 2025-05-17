@@ -1,102 +1,106 @@
-import { useState, useEffect } from "react";
+import React, { useState } from 'react';
+import { FaLeaf, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const Login = () => {
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Optional floating effect (just for fun)
-  useEffect(() => {
-    const floating = document.getElementById("plant-image");
-    if (floating) {
-      floating.animate(
-        [
-          { transform: "translateY(0px)" },
-          { transform: "translateY(-10px)" },
-          { transform: "translateY(0px)" }
-        ],
-        {
-          duration: 4000,
-          iterations: Infinity
-        }
-      );
-    }
-  }, []);
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log("Logging in:", { email, password });
-  };
+  const formik = useFormik({
+    initialValues: {
+      username: '',
+      password: '',
+    },
+    validationSchema: Yup.object({
+      username: Yup.string()
+        .min(3, 'Username must be at least 3 letters')
+        .required('Username is required.'),
+      password: Yup.string()
+        .min(8, 'Password must be at least 8 characters long.')
+        .required('Password is required.'),
+    }),
+    onSubmit: (values) => {
+      console.log('Logging in with:', values);
+    },
+  });
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left Panel */}
-      <div className="lg:w-1/2 w-full bg-gradient-to-br from-green-100 to-green-300 flex flex-col justify-center items-center p-12 relative overflow-hidden">
-        <h1 className="text-4xl font-bold text-green-800 mb-6 z-10 drop-shadow-lg">
-          Welcome to Plants of Nepal 🌿
-        </h1>
-        <p className="text-green-700 text-lg text-center mb-8 z-10 max-w-md">
-          Reconnect with nature. Log in and grow your plant journey with us!
-        </p>
-        <img
-          id="plant-image"
-          src="https://cdn-icons-png.flaticon.com/512/2909/2909769.png"
-          alt="Plant"
-          className="w-60 z-10"
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(#c9f7c2_1px,transparent_1px)] bg-[length:20px_20px] opacity-20" />
-      </div>
+    <div className="h-screen w-full bg-white flex items-center justify-center px-4 overflow-hidden">
+      <div className="w-full max-w-sm mx-auto overflow-auto sm:overflow-visible">
+        <motion.div
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="bg-white shadow-2xl rounded-2xl p-6 sm:p-8 border border-green-400 relative overflow-hidden w-full"
+        >
+          <div className="text-center mb-6">
+            <FaLeaf className="text-4xl text-green-600 inline-block animate-spin-slow" />
+            <h2 className="text-2xl sm:text-3xl font-bold text-green-700 mt-2">Forest Guardian Login</h2>
+            <p className="text-green-600 text-sm mt-1">Enter your realm credentials</p>
+          </div>
 
-      {/* Right Panel */}
-      <div className="lg:w-1/2 w-full bg-white flex items-center justify-center px-8 py-16">
-        <div className="max-w-md w-full">
-          <h2 className="text-3xl font-semibold text-green-700 mb-6">
-            Sign In to Your Account
-          </h2>
-          <form onSubmit={handleLogin} className="space-y-6">
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 bg-green-200 border-4 border-green-600 rounded-full flex items-center justify-center">
+              <span className="text-2xl font-bold text-green-700">🌿</span>
+            </div>
+          </div>
+
+          <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-green-700 font-medium mb-2">Email</label>
+              <label htmlFor="username" className="block text-green-800 font-semibold">Username</label>
               <input
-                type="email"
-                value={email}
-                required
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-green-300 rounded-md focus:ring-2 focus:ring-green-400 outline-none"
-                placeholder="you@example.com"
+                id="username"
+                name="username"
+                type="text"
+                placeholder="Enter your username"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.username}
+                className="w-full mt-1 px-4 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
+              {formik.touched.username && formik.errors.username ? (
+                <div className="text-red-500 text-sm mt-1">{formik.errors.username}</div>
+              ) : null}
             </div>
 
             <div>
-              <label className="block text-green-700 font-medium mb-2">Password</label>
-              <input
-                type="password"
-                value={password}
-                required
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-green-300 rounded-md focus:ring-2 focus:ring-green-400 outline-none"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <div className="flex items-center justify-between text-sm text-green-600">
-              <a href="#" className="hover:underline">Forgot password?</a>
+              <label htmlFor="password" className="block text-green-800 font-semibold">Password</label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.password}
+                  className="w-full mt-1 px-4 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-green-600"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+              {formik.touched.password && formik.errors.password ? (
+                <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
+              ) : null}
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-md font-semibold transition duration-300"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg shadow-md transition duration-300"
             >
-              Sign In
+              Login
             </button>
           </form>
-
-          <p className="mt-6 text-center text-sm text-green-600">
-            Don’t have an account?{" "}
-            <a href="#" className="text-green-800 font-medium hover:underline">
-              Sign up
-            </a>
-          </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
-}
+};
+
+export default Login;
